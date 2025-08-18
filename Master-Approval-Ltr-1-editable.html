@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Editable — Master Approval Ltr (1)</title>
+    <style>
+        body { 
+            font-family: Arial, Helvetica, sans-serif; 
+            margin: 16px; 
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Typography */
+        h1, h2, h3 { 
+            color: #333; 
+            margin: 1.5em 0 0.5em 0; 
+        }
+        h1 { 
+            font-size: 1.8em; 
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        h2 { 
+            font-size: 1.5em; 
+            color: #2c5aa0;
+        }
+        h3 { font-size: 1.2em; }
+        
+        p { 
+            margin: 0.5em 0; 
+        }
+        
+        /* Bold text styling */
+        strong {
+            font-weight: bold;
+            color: #2c5aa0;
+        }
+        
+        /* Tables */
+        table { 
+            border-collapse: collapse; 
+            width: 100%; 
+            margin: 1.5em 0; 
+            border: 2px solid #333;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        th, td { 
+            border: 1px solid #ccc; 
+            padding: 12px 15px; 
+            vertical-align: top; 
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c5aa0;
+            border-bottom: 2px solid #2c5aa0;
+        }
+        
+        /* Alternating row colors */
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        /* Lists */
+        ul, ol { 
+            margin: 0.5em 0 0.5em 1.5em; 
+        }
+        li {
+            margin: 0.3em 0;
+        }
+        
+        /* Image placeholders */
+        .image-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin: 10px 0;
+            color: #666;
+        }
+        
+        /* Editing features */
+        [contenteditable="true"]:focus { 
+            outline: 2px solid #4c9ffe; 
+            background-color: #fafafa;
+        }
+        
+        /* Control panel */
+        .control-panel {
+            position: sticky;
+            top: 0;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        
+        .control-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        .control-button:hover {
+            background: #0056b3;
+        }
+        
+        .control-button.secondary {
+            background: #6c757d;
+        }
+        .control-button.secondary:hover {
+            background: #545b62;
+        }
+        
+        /* JSON display */
+        #json-display {
+            display: none;
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        
+        /* Status indicator */
+        .status {
+            float: right;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .status.saved {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.modified {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <button class="control-button" onclick="toggleJsonDisplay()">Show/Hide JSON</button>
+        <button class="control-button secondary" onclick="exportContent()">Export HTML</button>
+        <button class="control-button secondary" onclick="printDocument()">Print</button>
+        <div class="status saved" id="status">Saved</div>
+    </div>
+    
+    <div id="json-display"></div>
+    
+    <div id="editor" contenteditable="true">
+        <p>ATTN:</p>
+<p>200 Oceangate, Suite 100</p>
+<p>Long Beach, CA 90802</p>
+<p>,</p>
+<p>,</p>
+<p><strong>Notice of Authorization</strong></p>
+<p>{MergeDateTime}</p>
+<p>Member Name:</p>
+<p>Optional (Care of:)</p>
+<p>Member ID Number:</p>
+<p>Member DOB:</p>
+<p>Requesting Provider:</p>
+<p>Date of Request:</p>
+<p>Authorization Number:</p>
+<table>
+  <tr>
+    <th>Requested Service/Item</th>
+    <th>Quantity</th>
+    <th>Dates of Service</th>
+  </tr>
+</table>
+<p>Dear :</p>
+<p>, thanks you for being a valued member of our plan. We reviewed the request for the service(s) or item(s) listed above. We are pleased to inform you that we have approved the requested service(s) or item(s).</p>
+<p>You or your doctor or health care provider may call us if you need more of these service(s) or item(s). Additional service(s) or item(s) require our review and approval.</p>
+<p>Your request is reviewed by our plan for medical need, plan coverage based on your benefits, health plan guidelines, state and or federal rules. You must be a member of our plan at the time of service.</p>
+<p>Please call Member Services at , TTY: 711,  if you have any questions.</p>
+<p>Sincerely,</p>
+    </div>
+    
+    <script>
+        let isJsonVisible = false;
+        let hasUnsavedChanges = false;
+        
+        function toggleJsonDisplay() {
+            const jsonDiv = document.getElementById('json-display');
+            isJsonVisible = !isJsonVisible;
+            
+            if (isJsonVisible) {
+                jsonDiv.style.display = 'block';
+                jsonDiv.textContent = 'JSON structure processed to create this editable document.\n\nOriginal structure: Docling format with references to text and table elements.';
+            } else {
+                jsonDiv.style.display = 'none';
+            }
+        }
+        
+        function exportContent() {
+            const content = document.getElementById('editor').innerHTML;
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'exported-content.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function printDocument() {
+            window.print();
+        }
+        
+        function updateStatus(status) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status ' + status;
+            statusDiv.textContent = status === 'saved' ? 'Saved' : 'Modified';
+        }
+        
+        // Auto-save functionality
+        let saveTimeout;
+        document.getElementById('editor').addEventListener('input', function() {
+            hasUnsavedChanges = true;
+            updateStatus('modified');
+            
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(function() {
+                // Simulate save
+                hasUnsavedChanges = false;
+                updateStatus('saved');
+                console.log('Auto-saved content');
+            }, 2000);
+        });
+        
+        // Warn before leaving if there are unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    </script>
+</body>
+</html>
